@@ -7,10 +7,14 @@
 
 sum = 0
 num = int(input('Введите трехзначное число: '))
+prnum = num
+equa = str(num)
 if 100>num or num>999:
     print('Вы ввели не трёхзначное число, вовторите попытку')
 else:
     while num > 0:
         sum += num % 10
         num = num // 10
-    print(sum)
+    print(f'{prnum} -> {sum} ({equa[0]} + {equa[1]} + {equa[2]})')
+
+# Так странно выглядит для того, чтобы соответствовало примеру из задачи
