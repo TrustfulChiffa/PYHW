@@ -9,4 +9,6 @@ n = int(input("Введите количество элементов в про�
 
 progression = [a1 + (i-1)*d for i in range(1, n+1)]
 
-print("Элементы прогрессии: ", progression)
+print("Элементы прогрессии: ")
+for elem in progression:
+    print(elem)
