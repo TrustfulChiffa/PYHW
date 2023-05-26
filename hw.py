@@ -1,45 +1,60 @@
-# Задача 34:  Винни-Пух попросил Вас посмотреть, есть ли в его стихах ритм. 
-# Поскольку разобраться в его кричалках не настолько просто, насколько легко он их придумывает, Вам стоит написать программу. 
-# Винни-Пух считает, что ритм есть, если число слогов (т.е. число гласных букв) в каждой фразе стихотворения одинаковое. 
-# Фраза может состоять из одного слова, если во фразе несколько слов, то они разделяются дефисами. 
-# Фразы отделяются друг от друга пробелами. Стихотворение  Винни-Пух вбивает в программу с клавиатуры. 
-# В ответе напишите “Парам пам-пам”, если с ритмом все в порядке и “Пам парам”, если с ритмом все не в порядке
+# Задача 36: Напишите функцию print_operation_table(operation, num_rows=6, num_columns=6), которая принимает в качестве 
+# аргумента функцию, вычисляющую элемент по номеру строки и столбца. Аргументы num_rows и num_columns указывают число строк 
+# и столбцов таблицы, которые должны быть распечатаны. Нумерация строк и столбцов идет с единицы (подумайте, почему не с нуля). 
+# Примечание: бинарной операцией называется любая операция, у которой ровно два аргумента, как, например, у операции умножения.
 
 # *Пример:*
 
-# **Ввод:** пара-ра-рам рам-пам-папам па-ра-па-да    
-#     **Вывод:** Парам пам-пам  
+# **Ввод:** `print_operation_table(lambda x, y: x * y) ` 
+# **Вывод:**
+# 1 2 3 4 5 6
 
-def check_rhythm(poem):
-    lines = poem.split()
-    syllable_counts = []
+# 2 4 6 8 10 12
+# 3 6 9 12 15 18
+# 4 8 12 16 20 24
+# 5 10 15 20 25 30
+# 6 12 18 24 30 36
 
-    for line in lines:
-        words = line.split('-')
-        syllables = sum(count_syllables(word) for word in words)
-        syllable_counts.append(syllables)
+def print_operation_table(operation, num_rows=6, num_columns=6):
+    for row in range(1, num_rows + 1):
+        row_elements = []
+        for col in range(1, num_columns + 1):
+            row_elements.append(str(operation(row, col)))
+        print(" ".join(row_elements))
 
-    if all(count == syllable_counts[0] for count in syllable_counts):
-        return "Парам пам-пам"
-    else:
-        return "Пам парам"
+print_operation_table(lambda x, y: x * y)
 
-def count_syllables(word):
-    vowels = "AEIOUYaeiouy"
-    count = 0
 
-    if word[0] in vowels:
-        count += 1
 
-    for index in range(1, len(word)):
-        if word[index] in vowels and word[index - 1] not in vowels:
-            count += 1
+# Пытался сделать так, чтобы корректно работали и другие функции (сложение, дление, степень и тд), но без сильного усложнения кода не получается, кажется, будто должно быть
+# более изящное решение
+# Порылся на stackoverflow, там было вот такое решение:
 
-    if word.endswith("e") and word[-2] not in vowels:
-        count -= 1
+# from math import log10
+# def printOperationTable(operation, numRows=9, numColumns=9):
+#     if operation(1,1)==2:
+#         print(1,end='\t')
+#     colSize = int(log10(operation(numRows+1, numColumns+1)))+2
+#     for row in range(1, numRows+1):
+#         for column in range(1, numColumns+1):
+#             if operation(1,1)==2:
+#                 column=column-1
+#             print("{:>{}}".format(operation(row,column), colSize), end='\t')
+#         print()
+# printOperationTable(lambda x,y: x*y, 10, 10)
 
-    return count
+# Но оно тоже косячит в случае с заменой умножения на другую функцию
 
-poem = input("Введите стихотворение Винни-Пуха: ")
-result = check_rhythm(poem)
-print(result)
+
+
+# Сложение решается просто изменением нумерации с 1 на 0 для оносительно корректного отображения:
+
+# def print_operation_table(operation, num_rows=6, num_columns=6):
+#     for row in range(0, num_rows + 1):
+#         row_elements = []
+#         for col in range(0, num_columns + 1):
+#             row_elements.append(str(operation(row, col)))
+#         print(" ".join(row_elements))
+# print_operation_table(lambda x, y: x + y)
+
+# Но почему-то мне кажется, что тут есть более красивое решение
