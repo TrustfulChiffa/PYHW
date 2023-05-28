@@ -1,60 +1,124 @@
-# Задача 36: Напишите функцию print_operation_table(operation, num_rows=6, num_columns=6), которая принимает в качестве 
-# аргумента функцию, вычисляющую элемент по номеру строки и столбца. Аргументы num_rows и num_columns указывают число строк 
-# и столбцов таблицы, которые должны быть распечатаны. Нумерация строк и столбцов идет с единицы (подумайте, почему не с нуля). 
-# Примечание: бинарной операцией называется любая операция, у которой ровно два аргумента, как, например, у операции умножения.
-
-# *Пример:*
-
-# **Ввод:** `print_operation_table(lambda x, y: x * y) ` 
-# **Вывод:**
-# 1 2 3 4 5 6
-
-# 2 4 6 8 10 12
-# 3 6 9 12 15 18
-# 4 8 12 16 20 24
-# 5 10 15 20 25 30
-# 6 12 18 24 30 36
-
-def print_operation_table(operation, num_rows=6, num_columns=6):
-    for row in range(1, num_rows + 1):
-        row_elements = []
-        for col in range(1, num_columns + 1):
-            row_elements.append(str(operation(row, col)))
-        print(" ".join(row_elements))
-
-print_operation_table(lambda x, y: x * y)
+# Задача 38: Дополнить телефонный справочник возможностью изменения и удаления данных. 
+# Пользователь также может ввести имя или фамилию, и Вы должны реализовать функционал для изменения и удаления данных
 
 
+from os import path
 
-# Пытался сделать так, чтобы корректно работали и другие функции (сложение, дление, степень и тд), но без сильного усложнения кода не получается, кажется, будто должно быть
-# более изящное решение
-# Порылся на stackoverflow, там было вот такое решение:
+file_base = "base.txt"
+last_id = 0
+all_data = []
 
-# from math import log10
-# def printOperationTable(operation, numRows=9, numColumns=9):
-#     if operation(1,1)==2:
-#         print(1,end='\t')
-#     colSize = int(log10(operation(numRows+1, numColumns+1)))+2
-#     for row in range(1, numRows+1):
-#         for column in range(1, numColumns+1):
-#             if operation(1,1)==2:
-#                 column=column-1
-#             print("{:>{}}".format(operation(row,column), colSize), end='\t')
-#         print()
-# printOperationTable(lambda x,y: x*y, 10, 10)
-
-# Но оно тоже косячит в случае с заменой умножения на другую функцию
+if not path.exists(file_base):
+    with open(file_base, "w", encoding="utf-8") as _:
+        pass
 
 
+def read_records():
+    global last_id, all_data
 
-# Сложение решается просто изменением нумерации с 1 на 0 для оносительно корректного отображения:
+    with open(file_base, encoding="utf-8") as f:
+        all_data = [i.strip() for i in f]
+        if all_data:
+            last_id = int(all_data[-1].split()[0])
+            return all_data
+    return []
 
-# def print_operation_table(operation, num_rows=6, num_columns=6):
-#     for row in range(0, num_rows + 1):
-#         row_elements = []
-#         for col in range(0, num_columns + 1):
-#             row_elements.append(str(operation(row, col)))
-#         print(" ".join(row_elements))
-# print_operation_table(lambda x, y: x + y)
 
-# Но почему-то мне кажется, что тут есть более красивое решение
+def show_all():
+    if all_data:
+        print(*all_data, sep="\n")
+    else:
+        print("Empty data")
+
+
+def change_record():
+    if all_data:
+        name = input("Enter the name or surname of the record to change: ")
+        found_records = []
+        for record in all_data:
+            if name.lower() in record.lower():
+                found_records.append(record)
+
+        if found_records:
+            print("Found records:")
+            for idx, record in enumerate(found_records):
+                print(f"{idx + 1}. {record}")
+
+            choice = input("Enter the number of the record to change: ")
+            if choice.isdigit() and 1 <= int(choice) <= len(found_records):
+                record_index = int(choice) - 1
+                record_data = found_records[record_index].split()
+                new_data = input("Enter the new data: ")
+                updated_record = " ".join([new_data] + record_data[1:])
+                all_data[all_data.index(found_records[record_index])] = updated_record
+                with open(file_base, "w", encoding="utf-8") as f:
+                    f.write("\n".join(all_data))
+                print("Record changed successfully!")
+            else:
+                print("Invalid choice!")
+        else:
+            print("No records found.")
+    else:
+        print("Empty data")
+
+
+def delete_record():
+    if all_data:
+        name = input("Enter the name or surname of the record to delete: ")
+        found_records = []
+        for record in all_data:
+            if name.lower() in record.lower():
+                found_records.append(record)
+
+        if found_records:
+            print("Found records:")
+            for idx, record in enumerate(found_records):
+                print(f"{idx + 1}. {record}")
+
+            choice = input("Enter the number of the record to delete: ")
+            if choice.isdigit() and 1 <= int(choice) <= len(found_records):
+                record_index = int(choice) - 1
+                del found_records[record_index]
+                with open(file_base, "w", encoding="utf-8") as f:
+                    f.write("\n".join(all_data))
+                print("Record deleted successfully!")
+            else:
+                print("Invalid choice!")
+        else:
+            print("No records found.")
+    else:
+        print("Empty data")
+
+
+def main_menu():
+    play = True
+    while play:
+        read_records()
+        answer = input("Phone book:\n"
+                       "1. Show all records\n"
+                       "2. Add a record\n"
+                       "3. Search a record\n"
+                       "4. Change\n"
+                       "5. Delete\n"
+                       "6. Exp/Imp\n"
+                       "7. Exit\n")
+        match answer:
+            case "1":
+                show_all()
+            case "2":
+                pass
+            case "3":
+                pass
+            case "4":
+                change_record()
+            case "5":
+                delete_record()
+            case "6":
+                pass
+            case "7":
+                play = False
+            case _:
+                print("Try again!\n")
+
+
+main_menu()
